@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VÉRA — Timeless pieces</title>
+    <style>
+        /* Basis-Design */
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #ffffff;
+            --accent-color: #4a4a4a;
+            --font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            padding-bottom: 80px; /* Platz für den Warenkorb-Button */
+        }
+        
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+        
+        /* Header Banner */
+        .top-banner {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            text-align: center;
+            padding: 8px 15px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        /* Hauptnavigation */
+        header {
+            background-color: var(--secondary-color);
+            padding: 20px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 25px;
+        }
+        
+        nav a {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+        
+        nav a:hover { color: var(--accent-color); }
+        
+        /* Hauptbereich */
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        /* Filter-Buttons */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            border: 1px solid #ddd;
+            background: none;
+            cursor: pointer;
+            font-size: 13px;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border-color: var(--primary-color);
+        }
+        
+        /* Produkt-Raster */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .product-card {
+            border: 1px solid #f9f9f9;
+            padding: 15px;
+            transition: box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .product-img-wrapper {
+            width: 100%;
+            padding-top: 100%; /* Quadratisches Bild-Format */
+            position: relative;
+            margin-bottom: 15px;
+            background-color: #f4f4f4; /* Platzhalter-Farbe */
+        }
+        
+        .product-img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Bild füllt den Bereich aus */
+        }
+        
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        
+        .product-title { font-size: 15px; margin-bottom: 5px; }
+        .product-price { font-size: 15px; font-weight: bold; margin-bottom: 10px; }
+        
+        /* Größen-Auswahl (Klein) */
+        .size-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .size-option {
+            font-size: 11px;
+            padding: 3px 6px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        
+        .size-option.active {
+            background-color: #eee;
+            font-weight: bold;
+        }
+
+        /* Zum Warenkorb Button */
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+        }
+        
+        .add-to-cart-btn:hover { opacity: 0.9; }
+        
+        /* Warenkorb Button (Unten am Bildschirm) */
+        #cart-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+        
+        #cart-fab:hover { transform: scale(1.05); }
+        
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff3b30;
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none; /* Versteckt, solange leer */
+        }
+        
+        /* Warenkorb Modal (Seitenleiste) */
+        #cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px; /* Versteckt */
+            width: 400px;
+            height: 100%;
+            background-color: var(--secondary-color);
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            z-index: 1100;
+            transition: right 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        #cart-sidebar.open { right: 0; }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .close-cart { font-size: 20px; cursor: pointer; }
+        
+        #cart-items-list { flex-grow: 1; overflow-y: auto; }
+        
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f9f9f9;
+            padding-bottom: 15px;
+        }
+        
+        .cart-item-img { width: 60px; height: 60px; background-color: #f4f4f4; object-fit: cover; }
+        .cart-item-details { flex-grow: 1; }
+        .cart-item-title { font-size: 14px; margin-bottom: 2px; }
+        .cart-item-meta { font-size: 11px; color: #666; }
+        .remove-item { color: #ff3b30; cursor: pointer; font-size: 11px; }
+        
+        .cart-total {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            text-align: center;
+            display: block;
+        }
+
+        /* FOOTER / INFOS */
+        footer {
+            background-color: #f9f9f9;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a { cursor: pointer; text-decoration: underline; }
+        .footer-info { text-align: center; line-height: 1.8; }
+        
+        /* Mobile Anpassung */
+        @media (max-width: 768px) {
+            #cart-sidebar { width: 100%; right: -100%; }
+            .logo { font-size: 20px; }
+            header { padding: 15px; }
+            nav ul { gap: 15px; }
+            nav a { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Banner -->
+<div class="top-banner">
+    VÉRA — Timeless pieces. | Lieferung in 10–16 Tagen
+</div>
+
+<!-- Hauptnavigation -->
+<header>
+    <div class="logo">VÉRA</div>
+    <nav>
+        <ul>
+            <li><a href="#home" onclick="filterProducts('all')" class="active" id="nav-all">Alles</a></li>
+            <li><a href="#clothing" onclick="filterProducts('clothing')" id="nav-clothing">Kleidung</a></li>
+            <li><a href="#shoes" onclick="filterProducts('shoes')" id="nav-shoes">Schuhe</a></li>
+            <li><a href="#bags" onclick="filterProducts('bags')" id="nav-bags">Taschen</a></li>
+            <li><a href="#jewelry" onclick="filterProducts('jewelry')" id="nav-jewelry">Schmuck</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Hauptbereich -->
+<main>
+    
+    <!-- Produkt-Raster -->
+    <div class="product-grid" id="product-container">
+        <!-- HIER WERDEN DIE PRODUKTE AUTOMATISCH EINGEFÜGT (SIEHE JAVASCRIPT UNTEN) -->
+    </div>
+
+</main>
+
+<!-- FOOTER / INFOS -->
+<footer>
+    <div class="footer-links">
+        <a>Impressum</a>
+        <a>Datenschutz</a>
+        <a>Widerruf</a>
+        <a>Versand</a>
+    </div>
+    <div class="footer-info">
+        VÉRA — Online Boutique<br>
+        Bestellungen via TikTok DM oder E-Mail.<br>
+        Lieferzeit: ca. 10–16 Tage.
+    </div>
+</footer>
+
+<!-- Floating Warenkorb Button (Unten rechts) -->
+<div id="cart-fab">
+    <span role="img" aria-label="Warenkorb">🛒</span>
+    <div id="cart-count">0</div>
+</div>
+
+<!-- Warenkorb Seitenleiste -->
+<div id="cart-sidebar">
+    <div class="cart-header">
+        <h3>Warenkorb</h3>
+        <span class="close-cart">&times;</span>
+    </div>
+    <div id="cart-items-list">
+        <!-- Hier erscheinen die Artikel -->
+        <p style="text-align: center; color: #999; margin-top: 30px;">Dein Warenkorb ist leer.</p>
+    </div>
+    <div class="cart-total">
+        <span>Summe (geschätzt):</span>
+        <span id="cart-total-price">0,00 €</span>
+    </div>
+    <button class="checkout-btn" id="copy-order-btn" onclick="prepareOrderMessage()">Bestellung kopieren (für DM/E-Mail)</button>
+    <p style="font-size: 11px; color: #666; text-align: center; margin-top: 15px;">Dies ist kein Bezahlvorgang. Die Bestellung wird in deine Zwischenablage kopiert, damit du sie uns senden kannst.</p>
+</div>
+
+<!-- JAVASCRIPT FÜR FUNKTIONALITÄT -->
+<script>
+    // 1. PRODUKTE DATENBANK (Hier trägst du deine Artikel ein!)
+    const products = [
+        { id: 1, title: "Minimalistischer Oversize Hoodie", price: 49.95, category: "clothing", img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=400", sizes: ["XS", "S", "M", "L"] },
+        { id: 2, title: "Elegante Leder-Handtasche VÉRA", price: 89.50, category: "bags", img: "https://images.unsplash.com/photo-1548036328-c9fa89d12891?q=80&w=400", sizes: ["Einheitsgröße"] },
+        { id: 3, title: "Gliederketten Halskette Gold", price: 35.00, category: "jewelry", img: "https://images.unsplash.com/photo-1515562141207-7a88fb783384?q=80&w=400", sizes: ["Einheitsgröße"] },
+        { id: 4, title: "Chunky Sneaker Weiß/Beige", price: 75.90, category: "shoes", img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=400", sizes: [36, 37, 38, 39, 40] },
+        { id: 5, title: "Seiden-Bluse Schwarz", price: 55.00, category: "clothing", img: "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?q=80&w=400", sizes: ["XS", "S", "M"] },
+        { id: 6, title: "Minimalistische Ohrringe Gold", price: 29.90, category: "jewelry", img: "https://images.unsplash.com/photo-1630942912827-a8e1e184a104?q=80&w=400", sizes: ["Einheitsgröße"] },
+        { id: 7, title: "Shopper Bag Groß", price: 65.00, category: "bags", img: "https://images.unsplash.com/photo-1590737282803-76a39d7c65ff?q=80&w=400", sizes: ["Einheitsgröße"] },
+        { id: 8, title: "Hohe Stiefel Schwarz Lederoptik", price: 119.99, category: "shoes", sizes: [37, 38, 39, 40], img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=400" }
+    ];
+
+    let cart = [];
+    let selectedSizes = {}; // Speichert die temporär gewählte Größe pro Produkt
+
+    // 2. PRODUKTE ANZEIGEN
+    function displayProducts(filter = 'all') {
+        const container = document.getElementById('product-container');
+        container.innerHTML = '';
+
+        const filteredProducts = filter === 'all' ? products : products.filter(p => p.category === filter);
+        
+        filteredProducts.forEach(product => {
+            // Größen-Buttons HTML generieren
+            let sizesHtml = '<div class="size-selector">';
+            product.sizes.forEach(size => {
+                const isDefault = size === "Einheitsgröße" || size === product.sizes[0];
+                const activeClass = isDefault ? 'active' : '';
+                const sizeValue = typeof size === 'string' ? `'${size}'` : size;
+                
+                sizesHtml += `<div class="size-option ${activeClass}" onclick="selectSize(${product.id}, ${sizeValue}, this)">${size}</div>`;
+                
+                // Standard-Größe vorwählen, wenn noch nicht geschehen
+                if (!selectedSizes[product.id]) {
+                    selectedSizes[product.id] = isDefault ? size : product.sizes[0];
+                }
+            });
+            sizesHtml += '</div>';
+
+            const productCard = `
+                <div class="product-card">
+                    <div class="product-img-wrapper">
+                        <img src="${product.img}" alt="${product.title}">
+                    </div>
+                    <div class="product-info">
+                        <div>
+                            <h3 class="product-title">${product.title}</h3>
+                            <p class="product-price">${product.price.toFixed(2)} €</p>
+                            ${sizesHtml}
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart(${product.id})">Zum Warenkorb</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += productCard;
+        });
+
+        // Aktiven Filter-Button hervorheben
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`nav-${filter}`).classList.add('active');
+    }
+
+    // Größe auswählen
+    function selectSize(productId, size, element) {
+        // Alle Optionen des Produkts deselektieren
+        const selector = element.parentElement;
+        selector.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('active'));
+        // Angeklickte Option selektieren
+        element.classList.add('active');
+        // Im globalen Objekt speichern
+        selectedSizes[productId] = size;
+    }
+
+    // 3. WARENKORB FUNKTIONEN
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        const size = selectedSizes[productId] || (typeof product.sizes[0] === 'string' ? product.sizes[0] : product.sizes[0]);
+        
+        // Prüfen, ob Produkt mit dieser Größe schon im Warenkorb ist
+        const existingItemIndex = cart.findIndex(item => item.id === product.id && item.size === size);
+        
+        if (existingItemIndex > -1) {
+            // Wenn ja, Menge erhöhen
+            cart[existingItemIndex].quantity += 1;
+        } else {
+            // Wenn nein, neu hinzufügen
+            cart.push({ ...product, quantity: 1, size: size });
+        }
+        
+        updateCartUI();
+        openCart();
+    }
+
+    function updateCartUI() {
+        const cartCount = document.getElementById('cart-count');
+        const cartItemsList = document.getElementById('cart-items-list');
+        const cartTotalPrice = document.getElementById('cart-total-price');
+        
+        // Gesamtmenge berechnen
+        const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+        
+        if (totalQuantity > 0) {
+            cartCount.style.display = 'flex';
+            cartCount.innerText = totalQuantity;
+        } else {
+            cartCount.style.display = 'none';
+            closeCart();
+        }
+
+        // Gesamtpreis berechnen
+        const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        cartTotalPrice.innerText = totalPrice.toFixed(2) + ' €';
+
+        // Liste im Sidebar aktualisieren
+        cartItemsList.innerHTML = '';
+        if (cart.length === 0) {
+             cartItemsList.innerHTML = '<p style="text-align: center; color: #999; margin-top: 30px;">Dein Warenkorb ist leer.</p>';
+        } else {
+            cart.forEach(item => {
+                cartItemsList.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.img}" alt="${item.title}" class="cart-item-img">
+                        <div class="cart-item-details">
+                            <h4 class="cart-item-title">${item.title}</h4>
+                            <p class="cart-item-meta">Größe: ${item.size} | Menge: ${item.quantity}</p>
+                            <p class="cart-item-meta">Preis: ${(item.price * item.quantity).toFixed(2)} €</p>
+                            <span class="remove-item" onclick="removeFromCart(${item.id}, '${item.size}')">Entfernen</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    function removeFromCart(productId, size) {
+        cart = cart.filter(item => !(item.id === productId && item.size === size));
+        updateCartUI();
+    }
+
+    // Warenkorb Sidebar öffnen/schließen
+    const cartFab = document.getElementById('cart-fab');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const closeCartBtn = document.querySelector('.close-cart');
+
+    cartFab.addEventListener('click', openCart);
+    closeCartBtn.addEventListener('click', closeCart);
+
+    function openCart() { cartSidebar.classList.add('open'); }
+    function closeCart() { cartSidebar.classList.remove('open'); }
+
+    // 4. BESTELLUNG VORBEREITEN (Zwischenablage)
+    function prepareOrderMessage() {
+        if (cart.length === 0) return;
+
+        let message = "Hallo VÉRA, ich möchte folgende Artikel bestellen:\n";
+        let total = 0;
+        
+        cart.forEach(item => {
+            message += `- ${item.title} (Größe: ${item.size}, Menge: ${item.quantity}) - ${ (item.price * item.quantity).toFixed(2) } €\n`;
+            total += item.price * item.quantity;
+        });
+        
+        message += "\nGesamtsumme (geschätzt): " + total.toFixed(2) + " €";
+        message += "\n\nLieferung an:\n[Name, Adresse]";
+
+        // In die Zwischenablage kopieren
+        navigator.clipboard.writeText(message).then(() => {
+            const btn = document.getElementById('copy-order-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "✅ In Zwischenablage kopiert!";
+            btn.style.backgroundColor = "#4CAF50";
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = "var(--primary-color)";
+            }, 3000);
+            
+            alert("Deine Bestellung wurde in die Zwischenablage kopiert. Sende sie uns jetzt per E-Mail oder TikTok DM!");
+        }).catch(err => {
+            console.error('Fehler beim Kopieren:', err);
+            alert("Kopieren fehlgeschlagen. Bitte die Artikel manuell notieren.");
+        });
+    }
+
+    // Initial: Produkte anzeigen
+    displayProducts();
+
+</script>
+</body>
+</html>
